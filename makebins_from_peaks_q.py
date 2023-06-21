@@ -30,7 +30,9 @@ parser.add_argument('--input', help='Name of the input file containing all the *
 parser.add_argument('--blacklist', help='Name of the blacklist regions file')
 parser.add_argument('--output', help='BaseName of the output  file', default='_bin_out.txt')
 parser.add_argument('--gbinsize', help='Genomic bin size',  default=1000)
-parser.add_argument('--evalue', help='E-value for peak called', type=float, default=1.3)
+parser.add_argument('--evalue', help='E-value for peak called, column 9', type=float, default=1.3)
+parser.add_argument('--peakscore', help='MACS score, column 7, mandatory --scorebased along with this option', type=float, default=0)
+parser.add_argument('--scorebased', help='Required to filter based on MACS score, column 7', action='store_true')
 parser.add_argument('--path', help='current path of analysis',  default=filePath)
 
 
@@ -67,7 +69,10 @@ def readpeaksfile(eachpeakfiles, blacklist_bed):
         # print(peaks)
         # filter the object by column 9 (8 index python) (q-value > 1.3 = q value 0.05
         # get the number of intervals in the filtered object
-        peaks_filtered = peaks.filter(lambda x: float(x[8]) > args.evalue)
+        if args.scorebased:
+            peaks_filtered = peaks.filter(lambda x: float(x[6]) > args.peakscore)
+        else:
+            peaks_filtered = peaks.filter(lambda x: float(x[8]) > args.evalue)
         # Intersect the filtered peaks with the blacklisted regions and obtain non overlapping peaks
         peaks_free_of_blacklist = peaks_filtered.intersect(blacklist_bed, v=True)
         peaks_filtered_count = peaks_free_of_blacklist.count()
@@ -90,6 +95,7 @@ def readpeaksfile(eachpeakfiles, blacklist_bed):
 
     return pybedtooldict
 
+# create bins as per the bin size and store in dictionary
 def quantifybins(pybedtooldict):
     fulldict = {}
     for peakfile_name in pybedtooldict:
@@ -177,9 +183,12 @@ peaklistout = readpeaklist(args.input)
 print('\n----> Reading blacklist regions,\n Blacklist = ' + args.blacklist + '\n')
 outputblacklist = blacklistregions(args.blacklist)
 # print(readpeaksfile(peaklistout, outputblacklist[1]))
-
-print('\n----> Cleaning and filtering peaksfile\n E-value = ' + str(args.evalue) + '\n')
-pybedtoolsout = readpeaksfile(peaklistout, outputblacklist[1])
+if args.scorebased:
+    print('\n----> Cleaning and filtering peaksfile\n Score-based = ' + str(args.peakscore) + '\n')
+    pybedtoolsout = readpeaksfile(peaklistout, outputblacklist[1])
+else:
+    print('\n----> Cleaning and filtering peaksfile\n E-value = ' + str(args.evalue) + '\n')
+    pybedtoolsout = readpeaksfile(peaklistout, outputblacklist[1])
 
 print('\n----> Cretaing bins for each peak files as per the given binsize, \nBinsize = ' + args.gbinsize + '\n')
 quantifybins(pybedtoolsout)
