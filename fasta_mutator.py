@@ -1,5 +1,5 @@
 import os,sys
-
+# python3 fasta_mutator.py myfasta.fasta snp.bed check_output.fasta
 def read_input(myfasta):
     with open(myfasta, "r") as myinput:
         myinput = myinput.readlines()
