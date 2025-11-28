@@ -47,7 +47,7 @@ def fasta_mutator(sequences, snps_dict):
     for ids in sequences:
         chrm = ids.replace('>', '')
         '''
-        Let's convert string to bytearray. Byte array are easily mutable and useful very long sequences
+        Let's convert string to bytearray. Byte array are easily mutable and useful to mutate very long sequences
         '''
         seqs = bytearray(sequences[ids], 'utf-8')
         for snps in snps_dict:
