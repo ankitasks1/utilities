@@ -13,7 +13,8 @@ def read_input(myfasta):
                 # print(line)
                 if chr_id != None:
                     sequences[chr_id] = "".join(chr_seq)
-                chr_id = line
+                chr_id = line.split(' ')[0]
+                #print(chr_id)
                 chr_seq = []
             # get the sequence here
             else:
@@ -37,7 +38,7 @@ def reads_snp_file(snpfile):
         for line in snps:
             line = line.strip().split('\t')
             # print(line[0], line[1])
-            sites = str(''.join(line[0] + '_' + line[1]))
+            sites = str(''.join(line[0] + '|' + line[1]))
             snps_dict[sites] = [line[2], line[3]]
     return(snps_dict)
 
@@ -47,12 +48,12 @@ def fasta_mutator(sequences, snps_dict):
     for ids in sequences:
         chrm = ids.replace('>', '')
         '''
-        Let's convert string to bytearray. Byte array are easily mutable and useful to mutate very long sequences
+        Let's convert string to bytearray. Byte array are easily mutable and useful very long sequences
         '''
         seqs = bytearray(sequences[ids], 'utf-8')
         for snps in snps_dict:
-            chrp = snps.split('_')[0]
-            pos = int(snps.split('_')[1])
+            chrp = snps.split('|')[0]
+            pos = int(snps.split('|')[1])
             ref = snps_dict[snps][0]
             alt = snps_dict[snps][1]
             if chrp == chrm:
@@ -72,12 +73,11 @@ def get_output(new_chr, myoutput):
             output.write('>' + nlines + '\n' + new_chr[nlines] +  '\n')
         output.close()
 
-if __name__ == "__main__":
-    print('reading fasta ...')
-    fasta_file  = read_input(sys.argv[1])
-    print('reading snp file ...')
-    snp_file  = reads_snp_file(sys.argv[2])
-    print('creating desired single nt mutations')
-    new_fasta_file = fasta_mutator(fasta_file, snp_file)
-    print('fetching mutated file')
-    get_output(new_fasta_file, sys.argv[3])
+print('reading fasta ...')
+fasta_file  = read_input(sys.argv[1])
+print('reading snp file ...')
+snp_file  = reads_snp_file(sys.argv[2])
+print('creating desired single nt mutations')
+new_fasta_file = fasta_mutator(fasta_file, snp_file)
+print('fetching mutated file')
+get_output(new_fasta_file, sys.argv[3])
