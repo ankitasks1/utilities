@@ -1,6 +1,6 @@
 import os, sys
 
-# python3 fasta_mutator.py myfasta.fasta snps.bed indels.bed output.fasta
+# python3 fastq_mutate_snp_indel.py myfasta.fasta snps.bed indels.bed output.fasta
 
 def read_input(myfasta):
     with open(myfasta, "r") as myinput:
