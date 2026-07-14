@@ -9,8 +9,8 @@ size_converter <- function(string){
     # print(temp)
     bytes_size <- case_when(
       temp_unit == "" ~ 0,
-      temp_unit == "B" ~ 1024,
-      temp_unit == "K" ~ 1024^2,
+      temp_unit == "B" ~ 1,
+      temp_unit == "K" ~ 1024^1,
       temp_unit == "M" ~ 1024^2,
       temp_unit == "G" ~ 1024^3,
       temp_unit == "T" ~ 1024^4,
